@@ -1,14 +1,29 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wallet, LogOut } from "lucide-react";
-import { NFCScanner } from "@/components/NFCScanner";
+import { Toaster as Sonner } from "sonner";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
+
+// Simple Components
+const Card = ({ children, className = "" }: any) => (
+  <div className={`bg-white rounded-lg shadow-md ${className}`}>{children}</div>
+);
+
+const CardHeader = ({ children }: any) => (
+  <div className="p-6 pb-2">{children}</div>
+);
+
+const CardTitle = ({ children, className = "" }: any) => (
+  <h3 className={`text-lg font-semibold ${className}`}>{children}</h3>
+);
+
+const CardDescription = ({ children }: any) => (
+  <p className="text-gray-600 text-sm">{children}</p>
+);
+
+const CardContent = ({ children, className = "" }: any) => (
+  <div className={`p-6 pt-2 ${className}`}>{children}</div>
+);
 
 function WalletConnect() {
   const { address, isConnected } = useAccount();
@@ -17,93 +32,69 @@ function WalletConnect() {
 
   if (isConnected) {
     return (
-      <Card className="w-full max-w-md mx-auto mb-6">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500">Connecté</p>
-              <p className="font-mono font-medium">
-                {address?.slice(0, 6)}...{address?.slice(-4)}
-              </p>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => disconnect()}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Déconnexion
-            </Button>
-          </div>
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader>
+          <CardTitle>Connecté</CardTitle>
+          <CardDescription>
+            Adresse: {address?.slice(0, 6)}...{address?.slice(-4)}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <button 
+            onClick={() => disconnect()} 
+            className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
+          >
+            Déconnexion
+          </button>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto mb-6">
+    <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Wallet className="w-5 h-5" />
-          Connexion sans friction
-        </CardTitle>
+        <CardTitle>Connexion Wallet</CardTitle>
+        <CardDescription>
+          Connectez votre wallet pour accéder au passeport numérique
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <p className="text-sm text-gray-600">
-          Pas de seed phrase. Pas de gas. Simple et sécurisé.
-        </p>
+      <CardContent>
         {connectors.map((connector) => (
-          <Button
+          <button
             key={connector.uid}
             onClick={() => connect({ connector })}
-            className="w-full"
-            variant={connector.name === 'Coinbase Wallet' ? 'default' : 'outline'}
+            className="w-full mb-2 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
           >
-            {connector.name === 'Coinbase Wallet' 
-              ? 'Connexion Smart Wallet' 
-              : connector.name}
-          </Button>
+            {connector.name}
+          </button>
         ))}
       </CardContent>
     </Card>
   );
 }
 
-function WatchWhispersApp() {
-  const { isConnected } = useAccount();
-
+function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-      <div className="max-w-2xl mx-auto py-8">
-        <header className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-50 text-gray-900 p-8">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl font-bold text-center mb-8">
             Watch Whispers
           </h1>
-          <p className="text-slate-600">
-            Votre passeport numérique de montre de luxe
+          <p className="text-center text-gray-600 mb-8">
+            Passeport Numérique de Montre de Luxe
           </p>
-        </header>
-
-        <WalletConnect />
-        
-        {isConnected && <NFCScanner />}
-        
-        <footer className="text-center mt-12 text-sm text-slate-500">
-          © 2026 Watch Whispers - Le Web3 au service du Luxe
-        </footer>
+          <WalletConnect />
+        </div>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Sonner />
       </div>
-    </div>
+    </BrowserRouter>
   );
 }
-
-const App = () => (
-  <TooltipProvider>
-    <Toaster />
-    <Sonner />
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<WatchWhispersApp />} />
-        <Route path="/index" element={<Index />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
-  </TooltipProvider>
-);
 
 export default App;

@@ -1,77 +1,95 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Smartphone, Nfc, CheckCircle, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
-import { Smartphone } from "lucide-react";
 
-interface NfcScanScreenProps {
-  onScan: () => void;
-}
+export default function NfcScanScreen() {
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanResult, setScanResult] = useState<any>(null);
 
-const NfcScanScreen = ({ onScan }: NfcScanScreenProps) => {
+  const handleScan = () => {
+    setIsScanning(true);
+    
+    // Simulate NFC scan
+    setTimeout(() => {
+      setScanResult({
+        success: true,
+        data: {
+          tokenId: 1,
+          nfcHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+          owner: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+          metadata: "ipfs://QmTestWatch001"
+        }
+      });
+      setIsScanning(false);
+    }, 2000);
+  };
+
   return (
     <motion.div
-      className="flex min-h-screen flex-col items-center justify-center bg-background px-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-2xl mx-auto space-y-6"
     >
-      {/* Logo */}
-      <motion.div
-        className="mb-12 text-center"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.3 }}
-      >
-        <h1 className="font-display text-3xl font-bold gold-text-gradient sm:text-4xl">
-          Aurunein
-        </h1>
-        <p className="font-body text-[10px] uppercase tracking-[0.3em] text-muted-foreground mt-1">
-          Haute Horlogerie — Genève
-        </p>
-      </motion.div>
-
-      {/* NFC Circle */}
-      <motion.button
-        onClick={onScan}
-        className="group relative mb-10 flex h-40 w-40 items-center justify-center rounded-full"
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, delay: 0.6 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        {/* Rings */}
-        <div className="absolute inset-0 rounded-full nfc-ring" />
-        <div className="absolute inset-[-12px] rounded-full nfc-ring" style={{ animationDelay: "0.5s" }} />
-        <div className="absolute inset-[-24px] rounded-full nfc-ring" style={{ animationDelay: "1s" }} />
-
-        <div className="relative flex flex-col items-center gap-2">
-          <Smartphone className="h-10 w-10 text-primary transition-transform duration-500 group-hover:scale-110" />
-        </div>
-      </motion.button>
-
-      {/* Instruction */}
-      <motion.div
-        className="text-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1 }}
-      >
-        <p className="font-body text-sm text-foreground mb-1">
-          Approchez votre appareil
-        </p>
-        <p className="font-body text-xs text-muted-foreground">
-          Scannez la puce sécurisée de votre garde-temps
-        </p>
-      </motion.div>
-
-      {/* Bottom shimmer bar */}
-      <motion.div
-        className="absolute bottom-0 left-0 right-0 h-px shimmer-effect"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-      />
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Nfc className="h-5 w-5" />
+            Scan NFC
+          </CardTitle>
+          <CardDescription>
+            Approchez votre téléphone de la montre pour vérifier son authenticité
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button 
+            onClick={handleScan} 
+            disabled={isScanning}
+            className="w-full"
+            size="lg"
+          >
+            <Smartphone className="mr-2 h-4 w-4" />
+            {isScanning ? "Scan en cours..." : "Tap NFC"}
+          </Button>
+          
+          {scanResult && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                {scanResult.success ? (
+                  <>
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <Badge variant="default" className="bg-green-500">
+                      Authentifiée
+                    </Badge>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-5 w-5 text-red-500" />
+                    <Badge variant="destructive">
+                      Non enregistrée
+                    </Badge>
+                  </>
+                )}
+              </div>
+              
+              {scanResult.success && (
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="space-y-2">
+                      <p><strong>Token ID:</strong> #{scanResult.data.tokenId}</p>
+                      <p><strong>NFC Hash:</strong> {scanResult.data.nfcHash.slice(0, 10)}...</p>
+                      <p><strong>Propriétaire:</strong> {scanResult.data.owner.slice(0, 6)}...{scanResult.data.owner.slice(-4)}</p>
+                      <p><strong>Métadonnées:</strong> {scanResult.data.metadata}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </motion.div>
   );
-};
-
-export default NfcScanScreen;
+}

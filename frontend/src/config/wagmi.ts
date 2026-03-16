@@ -12,8 +12,8 @@ const hardhat = {
     symbol: 'ETH',
   },
   rpcUrls: {
-    default: { http: ['http://127.0.0.1:8545'] },
-    public: { http: ['http://127.0.0.1:8545'] },
+    default: { http: ['http://127.0.0.1:8546'] },
+    public: { http: ['http://127.0.0.1:8546'] },
   },
 };
 
@@ -26,14 +26,14 @@ export const config = createConfig({
     }),
   ],
   transports: {
-    [hardhat.id]: http('http://127.0.0.1:8545'),
+    [hardhat.id]: http('http://127.0.0.1:8546'),
     [sepolia.id]: http('https://rpc.sepolia.org'),
     [mainnet.id]: http('https://eth.llamarpc.com'),
   },
 });
 
 export const CONTRACT_CONFIG = {
-  address: '0x5FbDB2315678afecb367f032d93F642f64180aa3' as `0x${string}`,
+  address: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9' as `0x${string}`,
   abi: [
     {
       inputs: [{ name: 'name', type: 'string' }, { name: 'symbol', type: 'string' }],

@@ -1,121 +1,140 @@
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import NfcScanScreen from "@/components/NfcScanScreen";
-import WatchHero from "@/components/WatchHero";
-import PassportCard from "@/components/PassportCard";
-import ProvenanceAccordion from "@/components/ProvenanceAccordion";
-import BiometricModal from "@/components/BiometricModal";
-import CrisisCards from "@/components/CrisisCards";
-import ArchitectureDiagram from "@/components/ArchitectureDiagram";
-import PitchView from "@/components/PitchView";
-import { Presentation } from "lucide-react";
+import { motion } from "framer-motion";
+import { Smartphone, Nfc, CheckCircle, XCircle } from "lucide-react";
 
-type View = "scan" | "passport" | "pitch";
+// Simple Components
+const Button = ({ children, onClick, disabled, className = "" }: any) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className={`px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400 ${className}`}
+  >
+    {children}
+  </button>
+);
+
+const Card = ({ children, className = "" }: any) => (
+  <div className={`bg-white rounded-lg shadow-md ${className}`}>{children}</div>
+);
+
+const CardHeader = ({ children }: any) => (
+  <div className="p-6 pb-2">{children}</div>
+);
+
+const CardTitle = ({ children, className = "" }: any) => (
+  <h3 className={`text-lg font-semibold ${className}`}>{children}</h3>
+);
+
+const CardDescription = ({ children }: any) => (
+  <p className="text-gray-600 text-sm">{children}</p>
+);
+
+const CardContent = ({ children, className = "" }: any) => (
+  <div className={`p-6 pt-2 ${className}`}>{children}</div>
+);
+
+const Badge = ({ children, variant = "default", className = "" }: any) => {
+  const baseClasses = "px-2 py-1 rounded text-xs font-medium";
+  const variantClasses = variant === "destructive" 
+    ? "bg-red-100 text-red-800" 
+    : "bg-green-100 text-green-800";
+  return <span className={`${baseClasses} ${variantClasses} ${className}`}>{children}</span>;
+};
 
 const Index = () => {
-  const [view, setView] = useState<View>("scan");
-  const [modalMode, setModalMode] = useState<"verify" | "transfer" | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanResult, setScanResult] = useState<any>(null);
 
-  if (view === "pitch") {
-    return <PitchView onBack={() => setView("passport")} />;
-  }
+  const handleScan = () => {
+    setIsScanning(true);
+    setTimeout(() => {
+      setScanResult({
+        success: true,
+        data: {
+          tokenId: 1,
+          nfcHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+          owner: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+          metadata: "ipfs://QmTestWatch001"
+        }
+      });
+      setIsScanning(false);
+    }, 2000);
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <AnimatePresence mode="wait">
-        {view === "scan" && (
-          <motion.div key="scan" exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
-            <NfcScanScreen onScan={() => setView("passport")} />
-          </motion.div>
-        )}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="min-h-screen bg-gray-50 p-8"
+    >
+      <div className="max-w-2xl mx-auto space-y-6">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            Watch Whispers
+          </h1>
+          <p className="text-gray-600">
+            Passeport Numérique de Montre de Luxe
+          </p>
+        </div>
 
-        {view === "passport" && (
-          <motion.div
-            key="passport"
-            className="pb-20"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-          >
-            {/* Top bar */}
-            <div className="flex items-center justify-between px-6 py-4">
-              <div>
-                <h1 className="font-display text-lg font-bold gold-text-gradient">Aurunein</h1>
-                <p className="font-body text-[8px] uppercase tracking-[0.2em] text-muted-foreground">
-                  Haute Horlogerie
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setView("pitch")}
-                  className="flex items-center gap-1.5 rounded-md gold-border px-3 py-1.5 font-body text-[10px] text-primary hover:bg-primary/10 transition-colors"
-                >
-                  <Presentation className="h-3 w-3" />
-                  Pitch
-                </button>
-                <button
-                  onClick={() => setView("scan")}
-                  className="font-body text-[10px] text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Nouveau Scan
-                </button>
-              </div>
-            </div>
-
-            {/* Shimmer reveal bar */}
-            <div className="h-px shimmer-effect mb-4" />
-
-            {/* Watch Hero */}
-            <WatchHero />
-
-            {/* Model name */}
-            <motion.div
-              className="text-center mb-8 px-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Nfc className="h-5 w-5" />
+              Scan NFC
+            </CardTitle>
+            <CardDescription>
+              Approchez votre téléphone de la montre pour vérifier son authenticité
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button 
+              onClick={handleScan} 
+              disabled={isScanning}
+              className="w-full"
             >
-              <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">
-                Chronographe Héritage
-              </h2>
-              <p className="font-body text-xs text-muted-foreground mt-1">
-                Or rose 18 carats — Calibre AH.01
-              </p>
-            </motion.div>
-
-            {/* Passport Card */}
-            <div className="px-4">
-              <PassportCard
-                onVerify={() => setModalMode("verify")}
-                onTransfer={() => setModalMode("transfer")}
-              />
-            </div>
-
-            {/* Provenance */}
-            <div className="px-4">
-              <ProvenanceAccordion />
-            </div>
-
-            {/* Architecture */}
-            <div className="px-4">
-              <ArchitectureDiagram />
-            </div>
-
-            {/* Crisis Cards */}
-            <div className="px-4">
-              <CrisisCards />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Biometric Modal */}
-      <BiometricModal
-        isOpen={modalMode !== null}
-        onClose={() => setModalMode(null)}
-        mode={modalMode ?? "verify"}
-      />
-    </div>
+              <Smartphone className="mr-2 h-4 w-4" />
+              {isScanning ? "Scan en cours..." : "Tap NFC"}
+            </Button>
+            
+            {scanResult && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  {scanResult.success ? (
+                    <>
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <Badge variant="default">
+                        Authentifiée
+                      </Badge>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="h-5 w-5 text-red-500" />
+                      <Badge variant="destructive">
+                        Non enregistrée
+                      </Badge>
+                    </>
+                  )}
+                </div>
+                
+                {scanResult.success && (
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="space-y-2">
+                        <p><strong>Token ID:</strong> #{scanResult.data.tokenId}</p>
+                        <p><strong>NFC Hash:</strong> {scanResult.data.nfcHash.slice(0, 10)}...</p>
+                        <p><strong>Propriétaire:</strong> {scanResult.data.owner.slice(0, 6)}...{scanResult.data.owner.slice(-4)}</p>
+                        <p><strong>Métadonnées:</strong> {scanResult.data.metadata}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </motion.div>
   );
 };
 
