@@ -1,73 +1,82 @@
-# Welcome to your Lovable project
+# Watch Whispers - Web3 Luxury Watch Passport
 
-## Project info
+Digital Product Passport pour montres de luxe avec ERC-721, Account Abstraction (ERC-4337) et NFC.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Structure du projet
 
-## How can I edit this code?
+```
+.
+├── contracts/          # Backend - Smart Contracts (Hardhat)
+│   ├── src/           # Contrats Solidity
+│   ├── test/          # Tests Hardhat
+│   └── scripts/       # Scripts de déploiement
+│
+├── frontend/           # Frontend - Application React (Vite)
+│   ├── src/          # Code source React
+│   └── package.json  # Dépendances frontend uniquement
+│
+└── lux-web3/         # Déploiement GitHub (mirror)
+```
 
-There are several ways of editing your application.
+## Démarrage rapide
 
-**Use Lovable**
+### 1. Backend (Smart Contracts)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+```bash
+cd contracts
+npm install
+npx hardhat node
+```
 
-Changes made via Lovable will be committed automatically to this repo.
+Dans un autre terminal :
+```bash
+cd contracts
+npx hardhat run scripts/deploy.js --network localhost
+```
 
-**Use your preferred IDE**
+### 2. Frontend (Application)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+cd frontend
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+→ Application sur http://localhost:5174
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Architecture
 
-**Use GitHub Codespaces**
+```
+NFC Tag → Smart Contract → IPFS/Arweave
+         ↓
+    Coinbase Smart Wallet (ERC-4337)
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Fonctionnalités
 
-## What technologies are used for this project?
+- **ERC-721 WatchPassport** - Unicité garantie par NFT
+- **Account Abstraction ERC-4337** - Pas de seed phrase, pas de gas
+- **NFC Linking** - Vérification physique par puce NFC
+- **Stockage décentralisé** - IPFS + Arweave
+- **Crisis Cards** : NFC Cloning, Gray Market, Social Recovery
 
-This project is built with:
+## Technologies
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+| Couche | Tech |
+|--------|------|
+| Backend | Solidity 0.8.26, Hardhat, OpenZeppelin |
+| Frontend | React 18, Vite, TypeScript, Tailwind, shadcn/ui |
+| Web3 | Wagmi, Viem, Coinbase Smart Wallet |
 
-## How can I deploy this project?
+## Tests
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+```bash
+cd contracts
+npx hardhat test
+```
 
-## Can I connect a custom domain to my Lovable project?
+**14 tests passants** (TDD)
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+**Hackathon Web3 au service du Luxe** - Mars 2026
