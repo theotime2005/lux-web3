@@ -18,28 +18,46 @@ export function useNFC() {
     try {
       if ('NDEFReader' in window) {
         const ndef = new (window as any).NDEFReader();
-        await ndef.scan();
+        
+        try {
+          await ndef.scan();
+          
+          return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+              reject(new Error('Scan timeout'));
+            }, 10000);
 
-        return new Promise((resolve) => {
-          ndef.addEventListener('reading', (event: any) => {
-            const serialNumber = event.serialNumber;
-            const hash = `0x${Array.from(new TextEncoder().encode(serialNumber))
-              .map(b => b.toString(16).padStart(2, '0'))
-              .join('')
-              .padStart(64, '0')}`;
-            
-            const data: NFCData = {
-              serialNumber,
-              hash,
-              isValid: true,
-            };
-            
-            setLastScan(data);
-            setIsScanning(false);
-            resolve(data);
+            ndef.addEventListener('reading', (event: any) => {
+              clearTimeout(timeout);
+              const serialNumber = event.serialNumber;
+              const hash = `0x${Array.from(new TextEncoder().encode(serialNumber))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('')
+                .padStart(64, '0')}`;
+              
+              const data: NFCData = {
+                serialNumber,
+                hash,
+                isValid: true,
+              };
+              
+              setLastScan(data);
+              setIsScanning(false);
+              resolve(data);
+            });
+
+            ndef.addEventListener('error', (err: any) => {
+              clearTimeout(timeout);
+              setError(err.message);
+              setIsScanning(false);
+              reject(err);
+            });
           });
-        });
+        } catch (scanErr) {
+          throw new Error(`NFC scan failed: ${scanErr instanceof Error ? scanErr.message : 'Unknown error'}`);
+        }
       } else {
+        // Simulation mode
         await new Promise(resolve => setTimeout(resolve, 2000));
         
         const mockData: NFCData = {

@@ -1,99 +1,94 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
-import { Toaster as Sonner } from "sonner";
+import { Toaster as Sonner, toast } from "sonner";
+import { useEffect } from 'react';
+import ErrorBoundary from "./components/ErrorBoundary";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
-// Simple Components
-const Card = ({ children, className = "" }: any) => (
-  <div className={`bg-white rounded-lg shadow-md ${className}`}>{children}</div>
-);
-
-const CardHeader = ({ children }: any) => (
-  <div className="p-6 pb-2">{children}</div>
-);
-
-const CardTitle = ({ children, className = "" }: any) => (
-  <h3 className={`text-lg font-semibold ${className}`}>{children}</h3>
-);
-
-const CardDescription = ({ children }: any) => (
-  <p className="text-gray-600 text-sm">{children}</p>
-);
-
-const CardContent = ({ children, className = "" }: any) => (
-  <div className={`p-6 pt-2 ${className}`}>{children}</div>
-);
-
 function WalletConnect() {
   const { address, isConnected } = useAccount();
-  const { connect, connectors } = useConnect();
+  const { connect, connectors, error, isPending } = useConnect();
   const { disconnect } = useDisconnect();
+
+  useEffect(() => {
+    if (error) {
+      toast.error(`Erreur de connexion: ${error.message}`);
+    }
+  }, [error]);
 
   if (isConnected) {
     return (
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader>
-          <CardTitle>Connecté</CardTitle>
-          <CardDescription>
+      <div className="card" style={{ maxWidth: '400px', margin: '0 auto' }}>
+        <div className="card-header">
+          <h3 className="card-title">Connecté</h3>
+          <p className="card-description">
             Adresse: {address?.slice(0, 6)}...{address?.slice(-4)}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </p>
+        </div>
+        <div className="card-content">
           <button 
             onClick={() => disconnect()} 
-            className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
+            className="btn btn-secondary btn-full"
           >
             Déconnexion
           </button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>Connexion Wallet</CardTitle>
-        <CardDescription>
+    <div className="card" style={{ maxWidth: '400px', margin: '0 auto' }}>
+      <div className="card-header">
+        <h3 className="card-title">Connexion Wallet</h3>
+        <p className="card-description">
           Connectez votre wallet pour accéder au passeport numérique
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+        </p>
+      </div>
+      <div className="card-content">
         {connectors.map((connector) => (
           <button
             key={connector.uid}
-            onClick={() => connect({ connector })}
-            className="w-full mb-2 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+            onClick={() => {
+              try {
+                connect({ connector });
+              } catch (err) {
+                toast.error(`Erreur: ${err instanceof Error ? err.message : 'Erreur inconnue'}`);
+              }
+            }}
+            disabled={isPending}
+            className="btn btn-primary btn-full"
+            style={{ marginBottom: 'var(--space-sm)' }}
           >
-            {connector.name}
+            {isPending ? 'Connexion...' : connector.name}
           </button>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-gray-50 text-gray-900 p-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-center mb-8">
-            Watch Whispers
-          </h1>
-          <p className="text-center text-gray-600 mb-8">
-            Passeport Numérique de Montre de Luxe
-          </p>
-          <WalletConnect />
+    <ErrorBoundary>
+      <BrowserRouter>
+        <div className="min-h-screen">
+          <div className="container">
+            <div style={{ textAlign: 'center', marginBottom: 'var(--space-xl)' }}>
+              <h1>Watch Whispers</h1>
+              <p>Passeport Numérique de Montre de Luxe</p>
+            </div>
+            <WalletConnect />
+          </div>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Sonner />
         </div>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Sonner />
-      </div>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 
