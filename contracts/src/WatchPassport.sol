@@ -4,6 +4,8 @@ pragma solidity ^0.8.23;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
 contract WatchPassport is ERC721, Ownable, ReentrancyGuard {
     
@@ -246,6 +248,43 @@ contract WatchPassport is ERC721, Ownable, ReentrancyGuard {
     
     function supportsERC4337() public pure returns (bool) {
         return true;
+    }
+    
+    // ==================== CARTE DE CRISE 1: DOUBLE SIGNATURE ====================
+    
+    error InvalidDoubleSignature();
+    
+    function unlockWithDoubleSig(
+        uint256 tokenId,
+        bytes memory signature1,
+        bytes memory signature2
+    ) public {
+        WatchData storage data = watchData[tokenId];
+        
+        if (!data.emergencyLocked) {
+            revert EmergencyLocked();
+        }
+        
+        // Message simple pour la double signature
+        bytes32 messageHash = keccak256(abi.encodePacked("UNLOCK_WATCH", tokenId, msg.sender));
+        
+        // Ajouter le préfixe EIP-191 (comme ethers.signMessage)
+        bytes32 ethSignedMessageHash = keccak256(
+            abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash)
+        );
+        
+        // Vérifier la première signature (appelant = msg.sender)
+        address recovered1 = ECDSA.recover(ethSignedMessageHash, signature1);
+        require(recovered1 == msg.sender, "First signature must be from caller");
+        
+        // Vérifier la deuxième signature (owner du contrat)
+        address recovered2 = ECDSA.recover(ethSignedMessageHash, signature2);
+        require(recovered2 == owner(), "Second signature must be from contract owner");
+        
+        // Déverrouiller le token
+        data.emergencyLocked = false;
+        
+        emit WatchUnlocked(tokenId);
     }
     
     // Fonction helper pour vérifier l'existence d'un token (compatibilité OZ v5)

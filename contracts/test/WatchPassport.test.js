@@ -76,16 +76,62 @@ describe('WatchPassport', function () {
   });
 
   describe('Crisis Card 1: NFC Cloned', function () {
-    it('Should lock and unlock with double signature', async function () {
+    it('Should lock and unlock with real double signature', async function () {
       await watchPassport.mintWithNFC(user1.address, NFC_HASH_1, METADATA_URI);
       
       // Owner locks the watch
       await watchPassport.emergencyLock(1);
       expect(await watchPassport.isEmergencyLocked(1)).to.be.true;
       
-      // User unlocks (double signature simulation)
-      await watchPassport.connect(user1).unlockWithDoubleSig(1);
+      // Create real ECDSA signatures for double signature verification
+      // The contract will create messageHash with "UNLOCK_WATCH" + tokenId + msg.sender
+      const message = ethers.solidityPacked(['string', 'uint256', 'address'], ['UNLOCK_WATCH', 1, user1.address]);
+      const messageHash = ethers.keccak256(message);
+      
+      // Use same EIP-191 prefix as contract
+      const ethSignedMessageHash = ethers.hashMessage(ethers.getBytes(messageHash));
+      
+      // First signature from user1 (msg.sender = token owner)
+      const signature1 = await user1.signMessage(ethers.getBytes(messageHash));
+      
+      // Second signature from owner (contract owner)
+      const signature2 = await owner.signMessage(ethers.getBytes(messageHash));
+      
+      // Verify both signatures are valid
+      const recovered1 = ethers.recoverAddress(ethers.getBytes(ethSignedMessageHash), signature1);
+      const recovered2 = ethers.recoverAddress(ethers.getBytes(ethSignedMessageHash), signature2);
+      
+      expect(recovered1).to.equal(user1.address);
+      expect(recovered2).to.equal(owner.address);
+      
+      // Unlock with real double signature verification
+      await watchPassport.connect(user1).unlockWithDoubleSig(
+        1,
+        signature1,
+        signature2
+      );
+      
       expect(await watchPassport.isEmergencyLocked(1)).to.be.false;
+    });
+    
+    it('Should reject unlock with invalid signatures', async function () {
+      await watchPassport.mintWithNFC(user1.address, NFC_HASH_1, METADATA_URI);
+      
+      await watchPassport.emergencyLock(1);
+      expect(await watchPassport.isEmergencyLocked(1)).to.be.true;
+      
+      // Create invalid signatures (use wrong tokenId)
+      const invalidMessage = ethers.solidityPacked(['string', 'uint256', 'address'], ['UNLOCK_WATCH', 999, user1.address]);
+      const invalidMessageHash = ethers.keccak256(invalidMessage);
+      const invalidSignature = await user1.signMessage(ethers.getBytes(invalidMessageHash));
+      
+      await expect(
+        watchPassport.connect(user1).unlockWithDoubleSig(
+          1,
+          invalidSignature,
+          invalidSignature
+        )
+      ).to.be.reverted;
     });
   });
 
