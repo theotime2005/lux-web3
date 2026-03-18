@@ -30,14 +30,20 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tanstack/react-query": "^5.90.21",
     "arweave": "^1.15.7",
+    "autoprefixer": "^10.4.27",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "lucide-react": "^0.577.0",
     "next": "16.1.7",
     "permissionless": "^0.3.4",
+    "postcss": "^8.5.8",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hook-form": "^7.71.2",
+    "react-router-dom": "^7.13.1",
     "sonner": "^2.0.7",
+    "tailwind-merge": "^3.5.0",
     "viem": "^2.47.4",
     "wagmi": "^3.5.0",
     "zod": "^4.3.6"
@@ -50,7 +56,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.7",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.2.1",
     "typescript": "^5"
   }
 }
