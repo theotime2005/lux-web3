@@ -67,9 +67,15 @@ export function useWatchPassport() {
   };
 
   const verifyWatch = async (tokenId: string, nfcHash: string) => {
-    if (!isClient || !isConnected) {
-      throw new Error('Wallet non connecté');
+    if (!isClient) {
+      throw new Error('Client non initialisé');
     }
+
+    console.log('🔍 Début de la vérification');
+    console.log('Token ID:', tokenId);
+    console.log('NFC Hash:', nfcHash);
+    console.log('Is Connected:', isConnected);
+    console.log('Is Client:', isClient);
 
     setIsLoading(true);
     try {
@@ -77,21 +83,27 @@ export function useWatchPassport() {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Simuler une vérification réussie
-      const isValid = true; // Toujours true pour la démo
+      const isVerified = true; // Toujours true pour la démo
       
-      if (isValid) {
-        toast.success('Montre authentifiée avec succès!');
+      console.log('✅ Simulation terminée, isVerified:', isVerified);
+      
+      if (isVerified) {
+        toast.success('✅ Authenticité certifiée sur blockchain');
+        console.log('✅ Toast success affiché');
         return true;
       } else {
-        toast.error('Montre non authentifiée');
+        toast.error('❌ Montre non authentifiée');
+        console.log('❌ Toast error affiché');
         return false;
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la vérification';
+      console.error('❌ Erreur dans verifyWatch:', err);
       toast.error(errorMessage);
       throw err;
     } finally {
       setIsLoading(false);
+      console.log('🔍 Fin de la vérification, isLoading:', false);
     }
   };
 

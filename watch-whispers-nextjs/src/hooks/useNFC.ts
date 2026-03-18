@@ -1,6 +1,11 @@
 import { useState, useCallback, useEffect } from 'react';
 
 interface NFCData {
+  data: {
+    tokenId: string;
+    nfcHash: string;
+    owner: string;
+  };
   serialNumber: string;
   hash: string;
   isValid: boolean;
@@ -68,8 +73,13 @@ export function useNFC() {
         await new Promise(resolve => setTimeout(resolve, 2000));
         
         const mockData: NFCData = {
-          serialNumber: '04:XX:XX:XX:XX:XX:XX',
-          hash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+          data: {
+            tokenId: '1268',
+            nfcHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef',
+            owner: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+          },
+          serialNumber: '04:XX:XX:XX:XX:XX:XX:XX',
+          hash: '0x1234567890abcdef1234567890abcdef1234567890abcdef',
           isValid: true,
         };
         
