@@ -11,38 +11,25 @@ Digital Product Passport pour montres de luxe avec ERC-721, Account Abstraction 
 │   ├── test/          # Tests Hardhat
 │   └── scripts/       # Scripts de déploiement
 │
-├── frontend/           # Frontend - Application React (Vite)
-│   ├── src/          # Code source React
+├── frontend/           # Frontend - Application Next
+│   ├── src/          # Code source
 │   └── package.json  # Dépendances frontend uniquement
-│
-└── lux-web3/         # Déploiement GitHub (mirror)
 ```
 
 ## Démarrage rapide
-
-### 1. Backend (Smart Contracts)
-
-```bash
-cd contracts
-npm install
-npx hardhat node
-```
-
-Dans un autre terminal :
-```bash
-cd contracts
-npx hardhat run scripts/deploy.js --network localhost
-```
-
-### 2. Frontend (Application)
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-→ Application sur http://localhost:5174
+- Cloner le dépôt
+    ```shell
+    git clone https://github.com/theotime2005/lux-web3
+    cd lux-web3
+    ```
+- Installer les dépendances
+    ```shell
+    npm run ci:all
+    ```
+- Lancer le projet globalement
+    ```shell
+    npm run dev
+    ```
 
 ## Architecture
 
@@ -62,21 +49,8 @@ NFC Tag → Smart Contract → IPFS/Arweave
 
 ## Technologies
 
-| Couche | Tech |
-|--------|------|
+| Couche | Tech                                   |
+|--------|----------------------------------------|
 | Backend | Solidity 0.8.26, Hardhat, OpenZeppelin |
-| Frontend | React 18, Vite, TypeScript, Tailwind, shadcn/ui |
-| Web3 | Wagmi, Viem, Coinbase Smart Wallet |
-
-## Tests
-
-```bash
-cd contracts
-npx hardhat test
-```
-
-**14 tests passants** (TDD)
-
----
-
-**Hackathon Web3 au service du Luxe** - Mars 2026
+| Frontend | Next, TypeScript, Tailwind, shadcn/ui  |
+| Web3 | Wagmi, Viem, Coinbase Smart Wallet     |
