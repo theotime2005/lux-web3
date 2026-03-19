@@ -1,0 +1,19 @@
+{
+  "name": "lux-web3",
+  "version": "1.0.0",
+  "description": "The lux web3 project",
+  "main": "\"\"",
+  "scripts": {
+    "test": "\"\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theotime2005/lux-web3.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/theotime2005/lux-web3/issues"
+  },
+  "homepage": "https://github.com/theotime2005/lux-web3#readme"
+}
