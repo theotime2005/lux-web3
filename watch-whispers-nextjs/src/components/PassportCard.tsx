@@ -1,93 +1,57 @@
 import { motion } from "framer-motion";
-import { Shield, CheckCircle } from "lucide-react";
+import { ShieldCheck, User, Hash, Watch, CheckCircle } from "lucide-react";
 
-interface PassportCardProps {
-  onVerify: () => void;
-  onTransfer: () => void;
+interface WatchData {
+  model: string;
+  serial: string;
+  owner: string;
+  status: string;
 }
 
-const PassportCard = ({ onVerify, onTransfer }: PassportCardProps) => {
+const InfoRow = ({ icon: Icon, label, value, gold }: { icon: any; label: string; value: string; gold?: boolean }) => (
+  <div className="flex items-center gap-4">
+    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-secondary ${gold ? "text-primary" : "text-muted-foreground"}`}>
+      <Icon size={18} />
+    </div>
+    <div>
+      <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{label}</p>
+      <p className={`text-sm tabular-nums ${gold ? "font-medium text-primary" : "font-mono text-foreground"}`}>{value}</p>
+    </div>
+  </div>
+);
+
+export const PassportCard = ({ data }: { data: WatchData }) => {
   return (
     <motion.div
-      className="mx-auto max-w-md gold-border rounded-lg bg-card p-6 sm:p-8"
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+      initial={{ opacity: 0, y: 20, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: "spring", bounce: 0.3, duration: 0.8 }}
+      className="surface-card relative w-full max-w-md mx-auto overflow-hidden p-8"
     >
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Shield className="h-5 w-5 text-primary" />
-          <span className="font-body text-xs font-medium uppercase tracking-[0.2em] text-primary">
-            Passeport Numérique
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <CheckCircle className="h-4 w-4 text-gold-muted" />
-          <span className="font-body text-xs text-gold-muted">Vérifié</span>
+      <div className="absolute top-0 right-0 p-4">
+        <div className="gold-badge">
+          <ShieldCheck size={12} />
+          Certifiée
         </div>
       </div>
 
-      {/* Certificate ID */}
-      <div className="mb-6">
-        <p className="font-body text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-          Certificat d'Authenticité
-        </p>
-        <p className="font-display text-2xl font-semibold text-foreground">
-          #LUX-2026-0437
-        </p>
+      <div className="mb-8">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Modèle</p>
+        <h3 className="font-display text-3xl text-foreground">{data.model}</h3>
       </div>
 
-      {/* Watch Details */}
-      <div className="mb-6 space-y-3">
-        <DetailRow label="Maison" value="Aurunein Haute Horlogerie" />
-        <DetailRow label="Modèle" value="Chronographe Héritage" />
-        <DetailRow label="Référence" value="AH-CH-RG-001" />
-        <DetailRow label="Calibre" value="AH.01 — Remontage manuel" />
-        <DetailRow label="Boîtier" value="Or rose 18 carats, 41mm" />
-        <DetailRow label="Cadran" value="Noir laqué, index or" />
-        <DetailRow label="Réserve de marche" value="72 heures" />
-        <DetailRow label="Étanchéité" value="50 mètres" />
-        <DetailRow label="Date d'émission" value="16 Mars 2026" />
+      <div className="grid grid-cols-1 gap-6">
+        <InfoRow icon={Hash} label="Numéro de Série" value={data.serial} />
+        <InfoRow icon={Watch} label="Authenticité" value={data.status} />
+        <InfoRow icon={User} label="Propriétaire Actuel" value={data.owner} />
+        <InfoRow icon={CheckCircle} label="Statut" value="Confirmé" gold />
       </div>
 
-      {/* Divider */}
-      <div className="my-6 h-px bg-border" />
-
-      {/* Ownership */}
-      <div className="mb-6">
-        <p className="font-body text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-1">
-          Propriétaire actuel
+      <div className="mt-8 border-t border-border pt-6 text-center">
+        <p className="text-[10px] text-muted-foreground italic">
+          Ce certificat numérique est lié de manière permanente à votre montre.
         </p>
-        <p className="font-body text-sm text-foreground">
-          Alexandre D. — Enregistré le 16 Mars 2026
-        </p>
-      </div>
-
-      {/* Actions */}
-      <div className="flex flex-col gap-3">
-        <button
-          onClick={onVerify}
-          className="w-full rounded-md bg-primary py-3 font-body text-sm font-medium text-primary-foreground transition-all duration-300 hover:brightness-110"
-        >
-          Vérifier l'Authenticité
-        </button>
-        <button
-          onClick={onTransfer}
-          className="w-full rounded-md gold-border bg-transparent py-3 font-body text-sm font-medium text-primary transition-all duration-300 hover:bg-primary/10"
-        >
-          Transférer l'Héritage
-        </button>
       </div>
     </motion.div>
   );
 };
-
-const DetailRow = ({ label, value }: { label: string; value: string }) => (
-  <div className="flex justify-between items-baseline">
-    <span className="font-body text-xs text-muted-foreground">{label}</span>
-    <span className="font-body text-sm text-foreground text-right max-w-[60%]">{value}</span>
-  </div>
-);
-
-export default PassportCard;
